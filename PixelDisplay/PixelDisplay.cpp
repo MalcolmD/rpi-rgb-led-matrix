@@ -47,7 +47,7 @@ static void DrawOnCanvas(Canvas *canvas)
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
 
 	RGBMatrix::Options matrix_options;
@@ -57,7 +57,7 @@ int main()
   	matrix_options.chain_length = 2;
   	matrix_options.parallel = 1;
 
-  	RGBMatrix *matrix = CreateMatrixFromOptions(matrix_options, runtime_opt);
+  	RGBMatrix *matrix = CreateMatrixFromFlags(&argc, &argv, &matrix_options);
 
   	matrix->ApplyStaticTransformer(UArrangementTransformer(matrix_options.parallel));
 
