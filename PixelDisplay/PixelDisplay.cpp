@@ -29,8 +29,9 @@ static void DrawOnCanvas(Canvas *canvas)
    * Let's create a simple animation. We use the canvas to draw
    * pixels. We wait between each step to have a slower animation.
    */
-  canvas->Fill(0, 0, 255);
+  //canvas->Fill(0, 0, 255);
 
+  uint8_t brightness = 255;
   int center_x = canvas->width() / 2;
   int center_y = canvas->height() / 2;
   float radius_max = canvas->width() / 2;
@@ -40,8 +41,11 @@ static void DrawOnCanvas(Canvas *canvas)
       return;
     float dot_x = cos(a * 2 * M_PI) * r;
     float dot_y = sin(a * 2 * M_PI) * r;
-    canvas->SetPixel(center_x + dot_x, center_y + dot_y,
-                     255, 0, 0);
+    canvas->SetPixel(0, 0, 0, 0, brightness);
+    //canvas->SetPixel(32, 0, 0, 0, brightness);
+    //canvas->SetPixel(0, 32, 0, 0, brightness);
+    canvas->SetPixel(32, 32, 0, 0, brightness);
+
     usleep(1 * 1000);  // wait a little to slow down things.
   }
 }
