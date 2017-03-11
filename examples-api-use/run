@@ -1,0 +1,21 @@
+#!/bin/bash
+
+clear
+echo -n "0  - some rotating square
+	 1  - forward scrolling an image (-m <scroll-ms>)
+	 2  - backward scrolling an image (-m <scroll-ms>)
+	 3  - test image: a square
+	 4  - Pulsing color
+	 5  - Grayscale Block
+	 6  - Abelian sandpile model (-m <time-step-ms>)
+	 7  - Conway's game of life (-m <time-step-ms>)
+	 8  - Langton's ant (-m <time-step-ms>)
+	 9  - Volume bars (-m <time-step-ms>)
+	 10 - Evolution of color (-m <time-step-ms>)
+	 11 - Brightness pulse generator
+
+Enter number(1-10) for demo: "
+
+read entry
+sudo ./demo -L --led-brightness=40 --led-rows=16 --led-chain=2 --led-no-hardware-pulse -D $entry 
+

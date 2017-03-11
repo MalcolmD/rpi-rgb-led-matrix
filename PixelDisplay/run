@@ -1,0 +1,5 @@
+#!/bin/bash
+# runs the Pixel Display program
+
+clear
+sudo ./PixelDisplay --led-no-hardware-pulse 
