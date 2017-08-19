@@ -8,12 +8,48 @@
 #include <math.h>
 #include <stdio.h>
 #include <signal.h>
+#include <string>
+#include "png++/png.hpp"
+#include <iostream>
+
+using namespace png;
+using namespace std;
 
 
 using rgb_matrix::GPIO;
 using rgb_matrix::RGBMatrix;
 using rgb_matrix::Canvas;
 using rgb_matrix::UArrangementTransformer;
+
+class PixelPiece
+{
+	private:
+		image<rgb_pixel> imageSource;
+	
+	public:	
+  		PixelPiece();
+  		~PixelPiece();
+
+  		void SetPixelPieceImage(string fileName);
+	
+		rgb_pixel GetPixel(int x, int y);
+};
+
+PixelPiece::PixelPiece()
+{}
+PixelPiece::~PixelPiece()
+{}
+void PixelPiece::SetPixelPieceImage(string fileName)
+{
+	imageSource.read(fileName);
+}
+
+rgb_pixel PixelPiece::GetPixel(int x, int y)
+{
+	imageSource.get_pixel(x, y);
+}
+
+
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) 
@@ -41,11 +77,17 @@ static void DrawOnCanvas(Canvas *canvas)
       return;
     float dot_x = cos(a * 2 * M_PI) * r;
     float dot_y = sin(a * 2 * M_PI) * r;
+
+    // SetPixel(self, int x, int y, uint8_t red, uint8_t green, uint8_t blue): 
 //    canvas->SetPixel(center_x+dot_x, center_y+dot_y, brightness, 0, 0);
     canvas->SetPixel(0, 0, 0, 0, brightness);
+
     canvas->SetPixel(31, 31, brightness, 0, 0);
     //canvas->SetPixel(0, 31, 0, brightness, brightness);
     //canvas->SetPixel(31, 0, brightness, 0, brightness);
+	  
+	  
+	// SetPixel(x, y, red, green, blue)
 
     usleep(1 * 1000);  // wait a little to slow down things.
   }
@@ -57,6 +99,12 @@ int main(int argc, char* argv[])
 
 	RGBMatrix::Options matrix_options;
   	rgb_matrix::RuntimeOptions runtime_opt;
+	PIxelPiece pixelPiece;
+	
+	// Read in pixel file to display.
+	// ...
+	// ...
+
 
   	matrix_options.rows = 16;
   	matrix_options.chain_length = 2;
@@ -83,3 +131,5 @@ int main(int argc, char* argv[])
 	
 	return 0;
 }
+
+
