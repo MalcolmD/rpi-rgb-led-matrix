@@ -27,18 +27,14 @@ class PixelPiece
 		image<rgb_pixel> imageSource;
 	
 	public:	
-  		PixelPiece();
-  		~PixelPiece();
+	
+		void DrawPixelCanvas(Canvas* canvas);
 
   		void SetPixelPieceImage(string fileName);
 	
 		rgb_pixel GetPixel(int x, int y);
 };
 
-PixelPiece::PixelPiece()
-{}
-PixelPiece::~PixelPiece()
-{}
 void PixelPiece::SetPixelPieceImage(string fileName)
 {
 	imageSource.read(fileName);
@@ -46,10 +42,21 @@ void PixelPiece::SetPixelPieceImage(string fileName)
 
 rgb_pixel PixelPiece::GetPixel(int x, int y)
 {
-	imageSource.get_pixel(x, y);
+	return imageSource.get_pixel(x, y);
 }
 
-
+void PixelPiece::DrawPixelCanvas(Canvas* canvas)
+{
+	for(int x = 0; x < 32; ++x)
+	{
+		for(int y = 0; y < 32; ++y)
+		{
+			rgb_pixel pix = GetPixel(x, y);
+			
+			canvas->SetPixel(x, y, (int)pix.red, (int)pix.green, (int)pix.blue);
+		}
+	}
+}
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) 
@@ -59,38 +66,27 @@ static void InterruptHandler(int signo)
 
 
 
-static void DrawOnCanvas(Canvas *canvas) 
+static void DrawOnCanvas(Canvas *canvas, PixelPiece* piece) 
 {
   /*
    * Let's create a simple animation. We use the canvas to draw
    * pixels. We wait between each step to have a slower animation.
    */
   //canvas->Fill(0, 0, 255);
-
-  uint8_t brightness = 100;
-  int center_x = canvas->width() / 2;
-  int center_y = canvas->height() / 2;
-  float radius_max = canvas->width() / 2;
-  float angle_step = 1.0 / 360;
-  for (float a = 0, r = 0; r < radius_max; a += angle_step, r += angle_step) {
-    if (interrupt_received)
-      return;
-    float dot_x = cos(a * 2 * M_PI) * r;
-    float dot_y = sin(a * 2 * M_PI) * r;
-
-    // SetPixel(self, int x, int y, uint8_t red, uint8_t green, uint8_t blue): 
-//    canvas->SetPixel(center_x+dot_x, center_y+dot_y, brightness, 0, 0);
-    canvas->SetPixel(0, 0, 0, 0, brightness);
-
-    canvas->SetPixel(31, 31, brightness, 0, 0);
-    //canvas->SetPixel(0, 31, 0, brightness, brightness);
-    //canvas->SetPixel(31, 0, brightness, 0, brightness);
+  
+  while(true)
+  {	  
+	  //canvas->SetPixel(0, 0, 0, 0, brightness);
 	  
+	  piece->DrawPixelCanvas(canvas);
+	  
+	  if (interrupt_received)
+		return; 
+	  
+	  usleep(1 * 1000);	
+  }   
 	  
 	// SetPixel(x, y, red, green, blue)
-
-    usleep(1 * 1000);  // wait a little to slow down things.
-  }
 }
 
 
@@ -99,13 +95,14 @@ int main(int argc, char* argv[])
 
 	RGBMatrix::Options matrix_options;
   	rgb_matrix::RuntimeOptions runtime_opt;
-	PIxelPiece pixelPiece;
+	PixelPiece pixelPiece;
+	
 	
 	// Read in pixel file to display.
-	// ...
+	pixelPiece.SetPixelPieceImage("bowl.png");
 	// ...
 
-
+	matrix_options.brightness = 50;
   	matrix_options.rows = 16;
   	matrix_options.chain_length = 2;
   	matrix_options.parallel = 1;
@@ -123,7 +120,7 @@ int main(int argc, char* argv[])
 	signal(SIGINT, InterruptHandler);
 
 
-  	DrawOnCanvas(canvas);
+  	DrawOnCanvas(canvas, &pixelPiece);
 
   	// Animation finished. Shut down the RGB matrix.
   	canvas->Clear();
